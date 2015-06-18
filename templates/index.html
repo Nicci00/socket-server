@@ -1,0 +1,23 @@
+<html>
+<head>
+	<title>Test</title>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+	<script type="text/javascript">
+	ready(function() {
+	  var socket = io.connect('http://' + document.domain + ':' + location.port);
+	  socket.on('info', function(data){
+	    document.write(data.artist);
+	    document.write(data.title);
+	    document.write(data.listeners);
+	  });
+	});
+
+	function ready(fn) {
+	  if (document.readyState != 'loading'){
+	    fn();
+	  } else {
+	    document.addEventListener('DOMContentLoaded', fn);
+	  }
+	}
+	</script>
+</head>
