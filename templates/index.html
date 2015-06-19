@@ -1,23 +1,26 @@
 <html>
 <head>
 	<title>Test</title>
-	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
-	<script type="text/javascript">
-	ready(function() {
-	  var socket = io.connect('http://' + document.domain + ':' + location.port);
-	  socket.on('info', function(data){
-	    document.write(data.artist);
-	    document.write(data.title);
-	    document.write(data.listeners);
-	  });
-	});
+	<script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function(){
+            namespace = ''; 
 
-	function ready(fn) {
-	  if (document.readyState != 'loading'){
-	    fn();
-	  } else {
-	    document.addEventListener('DOMContentLoaded', fn);
-	  }
-	}
-	</script>
+            var socket = io.connect('http://localhost:8080');
+
+            console.log("connected ok");
+
+            socket.on('info', function(msg) {
+            	console.log("got data");
+            	document.writeln(msg.title);
+            	document.writeln(msg.artist);
+            	document.writeln(msg.listeners);
+     	   });
+        });
+    </script>
 </head>
+<body>
+	
+</body>
+</html>

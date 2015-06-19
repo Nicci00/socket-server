@@ -33,12 +33,16 @@ def root():
 
 	return render_template('index.html')
 
-def watch_thread():
-	while True:
-		artist = getArtist()
-		title = getTitle()
-		listeners = getListeners()
+@socketio.on('connect', namespace='/test')
+def test_connect():
+	    emit('info', {'artist': getArtist(), 'title': getTitle(), 'listeners' : getListeners()})
 
+def watch_thread():
+	artist = getArtist()
+	title = getTitle()
+	listeners = getListeners()
+
+	while True:
 		time.sleep(2)
 
 		rf_artist = getArtist()
@@ -46,13 +50,20 @@ def watch_thread():
 		rf_listeners = getListeners()
 
 		if (artist != rf_artist) or (title != rf_title) or (listeners != rf_listeners):
+
 			print('detected false, emiting data')
+
+			artist = rf_artist
+			title = rf_title
+			listeners = rf_listeners
 
 			socketio.emit('info', {
 					'artist': rf_artist,
 					'title': rf_title,
 					'listeners': rf_listeners
 				})
+		else:
+			print('no changes found')
 
 def fetch_XML():
 	ice_user = parser.get('server', 'icecast_username')
