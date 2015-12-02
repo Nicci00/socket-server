@@ -4,7 +4,7 @@ monkey.patch_all()
 from flask import Flask, render_template
 from flask.ext.socketio import SocketIO, emit
 
-from xml.dom import minidom
+import xml.etree.ElementTree as ET
 import requests
 
 from ConfigParser import SafeConfigParser
@@ -18,6 +18,7 @@ parser = SafeConfigParser()
 parser.read('config.ini')
 
 app.config['SECRET_KEY'] = 'secretsecret'
+app.config['SERVER_NAME'] = 'localhost:8080'
 
 socketio = SocketIO(app)
 thread = None
@@ -65,22 +66,26 @@ def watch_thread():
 		else:
 			print('no changes found')
 
-def fetch_XML():
+def get_tree():
 	ice_user = parser.get('server', 'icecast_username')
 	ice_pass = parser.get('server', 'icecast_password')
 	ice_url = parser.get('server', 'xml_url')
 	
 	get = requests.get(ice_url, auth=(ice_user, ice_pass))
-	return minidom.parseString(get.text)
+
+	if get.status_code != 200:
+		raise Exception("status code %s" % get.status_code)
+	else:
+		return ET.ElementTree(ET.fromstring(get.text))
 
 def getArtist():
-	return unicode(fetch_XML().getElementsByTagName('artist')[0].firstChild.data)
+	return unicode(get_tree().find(".//artist").text)
 
 def getTitle():
-	return unicode(fetch_XML().getElementsByTagName('title')[1].firstChild.data)
+	return unicode(get_tree().findall(".//title")[1].text)
 
 def getListeners(): 
-	return int(fetch_XML().getElementsByTagName('listeners')[0].firstChild.data)
+	return int(get_tree().find(".//listeners").text)
 
 if __name__ == '__main__':
    socketio.run(app)
