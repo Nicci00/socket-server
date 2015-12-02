@@ -1,26 +1,29 @@
+<!DOCTYPE html>
 <html>
 <head>
-	<title>Test</title>
-	<script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
-    <script type="text/javascript" charset="utf-8">
-        $(document).ready(function(){
-            namespace = ''; 
-
-            var socket = io.connect('http://localhost:8080');
-
-            console.log("connected ok");
-
-            socket.on('info', function(msg) {
-            	console.log("got data");
-            	document.writeln(msg.title);
-            	document.writeln(msg.artist);
-            	document.writeln(msg.listeners);
-     	   });
-        });
-    </script>
+	<title>Test Client</title>
+	<script type="text/javascript">
+		function timestamp(){
+		return "[" + String(Math.floor(Date.now() / 1000)) + "] ";
+	}
+	var ws = new WebSocket('ws://shijou.moe:8080/');
+	ws.onopen = function(){
+		console.log(timestamp() + "Connected alright")
+	}
+	ws.onmessage = function(event) {
+		console.log(timestamp() + "Got data from server alright");
+		var data = JSON.parse(event.data)
+		document.getElementById("art").innerHTML = data.artist;
+		document.getElementById("tit").innerHTML = data.title;
+		document.getElementById("lis").innerHTML = data.listeners;
+	};
+	</script>
 </head>
 <body>
-	
+	<p>Artist(s): <span id="art"></span></p>
+	<p>Title: <span id="tit"></span></p>
+	<p>Current Listeners: <span id="lis"></span></p>
+
+	<a href="javascript:location.reload()">Reload</a>
 </body>
 </html>
